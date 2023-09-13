@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'portfolio_app',
 ]
 
 MIDDLEWARE = [
@@ -46,8 +47,14 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware", 
 ]
+
+# Add support for authenticating users
+AUTHENTICATION_BACKENDS = [
+'django.contrib.auth.backends.ModelBackend',
+]
+
 
 ROOT_URLCONF = "django_project.urls"
 
