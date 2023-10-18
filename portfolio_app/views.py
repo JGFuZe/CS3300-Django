@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views import generic
+
+from portfolio_app.forms import ProjectForm
 from .models import Student, Portfolio, Project
 
 
@@ -9,8 +11,6 @@ from .models import Student, Portfolio, Project
 # Student Class Views
 class StudentListView(generic.ListView):
     model = Student
-
-
 class StudentDetailView(generic.DetailView):
     model = Student
 
@@ -18,15 +18,12 @@ class StudentDetailView(generic.DetailView):
 # Portfolio Class Views
 class PortfolioListView(generic.ListView):
     model = Portfolio
-
-
 class PortfolioDetailView(generic.DetailView):
     model = Portfolio
 
     # override get_context_data to add a project_info object to portfolio_detail.html
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        k = Portfolio.pk
         context["project_info"] = Project.objects.filter(
             portfolio_id=self.get_object())
         return context
@@ -35,16 +32,13 @@ class PortfolioDetailView(generic.DetailView):
 # Project Class Views
 class ProjectListView(generic.ListView):
     model = Project
-
-
 class ProjectDetailView(generic.DetailView):
     model = Project
 
 
 # pass all active portfolio's to homepage
 def index(request):
-    student_active_portfolios = Student.objects.select_related(
-        'portfolio').all().filter(portfolio__is_active=True)
+    student_active_portfolios = Student.objects.select_related('portfolio').all().filter(portfolio__is_active=True)
     print("active portfolio query set", student_active_portfolios)
     return render(request, 'portfolio_app/index.html', {'student_active_portfolios': student_active_portfolios})
 
@@ -53,9 +47,40 @@ def oldHome(request):
     return HttpResponse('Home Page')
 
 
-def test1(request):
-    return HttpResponse('test1')
+def createProject(request, portfolio_id):
+
+    form = ProjectForm()
+    portfolio = Portfolio.objects.get(pk=portfolio_id)
+    print(portfolio)
+
+    if request.method == 'POST':
+        project_data = request.POST.copy()
+        project_data['portfolio_id'] = portfolio_id
+
+        form = ProjectForm(project_data)
+        if form.is_valid():
+            # Save the form
+            project = form.save()
+
+            # Set the projects parent portfolio
+            project.porfolio = portfolio
+            project.save()
+
+            # Redirect back to portfolio details page
+            return redirect('portfolio-detail', portfolio_id)
+        
+    context = {'form':form}
+    return render(request, 'portfolio_app/project_form.html', context)
 
 
-def test2(request):
-    return HttpResponse('test2')
+def deleteProject(request, portfolio_id, project_id):
+
+    # Store project object in project variable
+    project = Project.objects.get(id=project_id)
+
+    if request.method == 'POST':
+        project.delete()
+        return redirect('portfolio-detail', portfolio_id)
+    
+    context = {'project':project}
+    return render(request, 'portfolio_app/delete_project_form.html', context)
