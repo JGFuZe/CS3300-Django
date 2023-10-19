@@ -7,7 +7,7 @@ class Portfolio(models.Model):
 
     title = models.CharField(max_length=200)
     contact_email = models.CharField(max_length=200)
-    is_active = models.BooleanField(default=False, blank=True, null=True)
+    is_active = models.BooleanField(default=False, null=True)
     about = models.TextField(blank=True)
 
 
@@ -55,7 +55,7 @@ class Student(models.Model):
 
 class Project(models.Model):
     title = models.CharField(max_length=200)
-    discription = models.TextField(blank=False)
+    discription = models.TextField(blank=False, null=True)
     portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE, default = None)
 
      #Define default String to return the name for representing the Model object."

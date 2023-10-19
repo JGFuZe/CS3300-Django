@@ -47,7 +47,7 @@ def index(request):
 def createProject(request, portfolio_id):
 
     form = ProjectForm()
-    portfolio = Portfolio.objects.get(id=portfolio_id)
+    portfolio = Portfolio.objects.get(pk=portfolio_id)
     print(portfolio)
 
     if request.method == 'POST':
