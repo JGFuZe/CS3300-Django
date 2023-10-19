@@ -7,7 +7,7 @@ class Portfolio(models.Model):
 
     title = models.CharField(max_length=200)
     contact_email = models.CharField(max_length=200)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False, blank=True, null=True)
     about = models.TextField(blank=True)
 
 
@@ -67,7 +67,11 @@ class Project(models.Model):
     # add a "View on Site" button to the model's record editing screens in the Admin site
     def get_absolute_url(self):
         return reverse('project-detail', args=[str(self.id)])
-    
+
+
+class ThemeChanger(models.Model):
+    is_dark = models.BooleanField(default=False)
+
 """""
 # Model to represent the relationship between projects and portfolios.]
 # Each instance of this model will have a reference to a Portfolio and a Project,
@@ -86,5 +90,3 @@ class Meta:
     #ensures that each project is associated with only one portfolio
     unique_together = ('portfolio', 'project')
 """""
-
-

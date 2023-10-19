@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views import generic
 
-from portfolio_app.forms import ProjectForm
-from .models import Student, Portfolio, Project
+from .forms import ProjectForm
+from .models import Student, Portfolio, Project, ThemeChanger
 
 
 # Create your views here.
@@ -42,15 +42,12 @@ def index(request):
     print("active portfolio query set", student_active_portfolios)
     return render(request, 'portfolio_app/index.html', {'student_active_portfolios': student_active_portfolios})
 
-
-def oldHome(request):
-    return HttpResponse('Home Page')
-
-
+#
+#
 def createProject(request, portfolio_id):
 
     form = ProjectForm()
-    portfolio = Portfolio.objects.get(pk=portfolio_id)
+    portfolio = Portfolio.objects.get(id=portfolio_id)
     print(portfolio)
 
     if request.method == 'POST':
@@ -72,7 +69,8 @@ def createProject(request, portfolio_id):
     context = {'form':form}
     return render(request, 'portfolio_app/project_form.html', context)
 
-
+#
+#
 def deleteProject(request, portfolio_id, project_id):
 
     # Store project object in project variable
@@ -84,3 +82,39 @@ def deleteProject(request, portfolio_id, project_id):
     
     context = {'project':project}
     return render(request, 'portfolio_app/delete_project_form.html', context)
+
+
+#
+#
+def updateProject(request, portfolio_id, project_id):
+    form = ProjectForm()
+    # Store project object in project variable
+    project = Project.objects.get(id=project_id)
+
+    # Update form with current information
+    form = ProjectForm(instance=project)
+    if form.is_valid():
+        # Save the form
+        project = form.save()
+        
+        # Redirect back to portfolio details page
+        return redirect('portfolio_app/portfolio-detail', portfolio_id)
+        
+    context = {'form':form}
+    return render(request, 'portfolio_app/project_form.html', context)
+
+
+
+#
+#
+def ThemeChangerView(request):
+    theme_mode = ThemeChanger.objects.latest('id')
+    if theme_mode.is_dark == False:
+        theme_mode.is_dark = True
+        theme_mode.save()
+    else:
+        theme_mode.is_dark = False
+        theme_mode.save()          
+    context = {'theme_mode':theme_mode.is_dark}
+    return render(request,'portfolio_app/index.html',context)
+

@@ -5,6 +5,8 @@
 {% block content %}
   <form action="" method="POST">
     {% csrf_token %}
-    <input type="submit" name="Submit" />
+    <p>Are you sure you want to delete this project? {}</p>
+    <input type="submit" name="Submit", value="Confirm Delete" />
+    <button onclick="window.history.back();" class="btn btn-default" type="button">Cancel</button>
   </form>
 {% endblock %}
